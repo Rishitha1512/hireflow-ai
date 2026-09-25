@@ -1,15 +1,19 @@
 import os
 import time
+import json
 
 from google import genai
 from dotenv import load_dotenv
 
 load_dotenv()
+# Load the Gemini API key from environment variables.
 
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 
 def extract_candidate_info(resume_text):
+    # Extract structured candidate information from the uploaded resume.
+    # The prompt explicitly restricts the model to information present in the resume.
     prompt = f"""
 You are a recruitment assistant.
 
@@ -36,7 +40,7 @@ Rules:
 RESUME:
 {resume_text}
 """
-
+    # Retry the AI request up to 3 times to handle temporary API failures.
     for attempt in range(3):
         try:
             response = client.models.generate_content(
@@ -51,9 +55,21 @@ RESUME:
 
             time.sleep(2)
 
-    return response.text
+    text = response.text.strip()
+
+    # Remove Markdown code fences if Gemini adds them
+    if text.startswith("```json"):
+        text = text[7:]
+
+    if text.endswith("```"):
+        text = text[:-3]
+
+    return json.loads(text.strip())
+
 
 def ask_candidate(question, candidate_data):
+    # Answer recruiter questions using only the structured candidate information.
+    # This prevents the Q&A layer from relying on unrelated model knowledge.
     prompt = f"""
 You are a recruitment assistant.
 
@@ -81,6 +97,7 @@ Rules:
     return response.text
 
 def generate_evaluation(candidate_data):
+     # Generate a structured HR evaluation using only the extracted candidate data.
     prompt = f"""
 You are an HR recruitment assistant.
 
@@ -114,4 +131,13 @@ Rules:
         contents=prompt
     )
 
-    return response.text
+    text = response.text.strip()
+
+    # Remove Markdown code fences if Gemini adds them
+    if text.startswith("```json"):
+        text = text[7:]
+
+    if text.endswith("```"):
+        text = text[:-3]
+    # Convert the AI response into a Python dictionary for the rest of the workflow.
+    return json.loads(text.strip())

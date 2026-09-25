@@ -1,3 +1,4 @@
+# Map extracted candidate data and AI evaluation into the mock corporate HR form.
 def create_hr_form(candidate, evaluation):
     return {
         "candidate_name": candidate.get("name", ""),
