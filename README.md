@@ -198,7 +198,11 @@ Provides the recruiter-facing interface for:
 The end-to-end application demonstrates:
 
 **Resume Upload → AI Extraction → Recruiter Q&A → AI Evaluation → HR Form Auto-Fill → Downloadable PDF**
+### Application
 ![alt text](image.png)
+
+### Generated HR Evaluation PDF
+![alt text](image-1.png)
 
 ## Next Steps
 
