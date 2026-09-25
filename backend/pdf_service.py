@@ -287,7 +287,8 @@ def create_hr_pdf(form_data, output_path):
 
     story = []
 
-    # Top accent line
+    # ---------- TOP ACCENT LINE ----------
+
     accent_line = Table(
         [[""]],
         colWidths=[174 * mm],
@@ -310,7 +311,8 @@ def create_hr_pdf(form_data, output_path):
     story.append(accent_line)
     story.append(Spacer(1, 12))
 
-    # Header
+    # ---------- HEADER ----------
+
     story.append(
         Paragraph(
             "HIREFLOW",
@@ -473,12 +475,13 @@ def create_hr_pdf(form_data, output_path):
                 )
 
                 # Role + company
-                story.append(
-                    Paragraph(
-                        f"<b>{role} — {company}</b>",
-                        body_style,
+                if role or company:
+                    story.append(
+                        Paragraph(
+                            f"<b>{role} — {company}</b>",
+                            body_style,
+                        )
                     )
-                )
 
                 # Duration
                 if duration:
@@ -518,7 +521,7 @@ def create_hr_pdf(form_data, output_path):
             )
         )
 
-    # ---------- SKILLS ----------
+    # ---------- TECHNICAL SKILLS ----------
 
     story.append(
         Paragraph(
@@ -541,9 +544,64 @@ def create_hr_pdf(form_data, output_path):
     )
 
     if projects:
-        story.extend(
-            make_bullets(projects)
-        )
+
+        for project in projects:
+
+            # Structured project returned by Gemini
+            if isinstance(project, dict):
+
+                project_name = project.get(
+                    "name",
+                    "",
+                )
+
+                description = project.get(
+                    "description",
+                    "",
+                )
+
+                details = project.get(
+                    "details",
+                    [],
+                )
+
+                # Project name
+                if project_name:
+                    story.append(
+                        Paragraph(
+                            f"<b>{project_name}</b>",
+                            body_style,
+                        )
+                    )
+
+                # Project description
+                if description:
+                    story.append(
+                        Paragraph(
+                            description,
+                            body_style,
+                        )
+                    )
+
+                # Project details
+                if details:
+                    story.extend(
+                        make_bullets(details)
+                    )
+
+                story.append(
+                    Spacer(1, 6)
+                )
+
+            # Fallback if project is returned as a string
+            else:
+                story.append(
+                    Paragraph(
+                        f"• {str(project)}",
+                        bullet_style,
+                    )
+                )
+
     else:
         story.append(
             Paragraph(
