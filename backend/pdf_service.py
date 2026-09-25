@@ -25,7 +25,7 @@ def create_hr_pdf(form_data, output_path):
 
     styles = getSampleStyleSheet()
 
-    # ---------- HIREFlOW COLORS ----------
+    # ---------- HIREFLOW COLORS ----------
 
     AMBER = colors.HexColor("#E9A642")
     LIGHT_AMBER = colors.HexColor("#FFF7E6")
@@ -325,7 +325,8 @@ def create_hr_pdf(form_data, output_path):
         )
     )
 
-    # Candidate profile card
+    # ---------- CANDIDATE PROFILE ----------
+
     profile_data = [
         [
             Paragraph(
@@ -414,7 +415,8 @@ def create_hr_pdf(form_data, output_path):
 
     story.append(profile_table)
 
-    # Education
+    # ---------- EDUCATION ----------
+
     story.append(
         Paragraph(
             "EDUCATION",
@@ -423,7 +425,9 @@ def create_hr_pdf(form_data, output_path):
     )
 
     if education:
-        story.extend(make_bullets(education))
+        story.extend(
+            make_bullets(education)
+        )
     else:
         story.append(
             Paragraph(
@@ -432,7 +436,8 @@ def create_hr_pdf(form_data, output_path):
             )
         )
 
-    # Experience
+    # ---------- EXPERIENCE ----------
+
     story.append(
         Paragraph(
             "EXPERIENCE",
@@ -441,7 +446,70 @@ def create_hr_pdf(form_data, output_path):
     )
 
     if experience:
-        story.extend(make_bullets(experience))
+
+        for exp in experience:
+
+            # Structured experience returned by Gemini
+            if isinstance(exp, dict):
+
+                role = exp.get(
+                    "role",
+                    "",
+                )
+
+                company = exp.get(
+                    "company",
+                    "",
+                )
+
+                duration = exp.get(
+                    "duration",
+                    "",
+                )
+
+                responsibilities = exp.get(
+                    "responsibilities",
+                    [],
+                )
+
+                # Role + company
+                story.append(
+                    Paragraph(
+                        f"<b>{role} — {company}</b>",
+                        body_style,
+                    )
+                )
+
+                # Duration
+                if duration:
+                    story.append(
+                        Paragraph(
+                            f"<i>{duration}</i>",
+                            small_style,
+                        )
+                    )
+
+                # Responsibilities
+                if responsibilities:
+                    story.extend(
+                        make_bullets(
+                            responsibilities
+                        )
+                    )
+
+                story.append(
+                    Spacer(1, 6)
+                )
+
+            # Fallback if experience is returned as a string
+            else:
+                story.append(
+                    Paragraph(
+                        f"• {str(exp)}",
+                        bullet_style,
+                    )
+                )
+
     else:
         story.append(
             Paragraph(
@@ -450,7 +518,8 @@ def create_hr_pdf(form_data, output_path):
             )
         )
 
-    # Skills
+    # ---------- SKILLS ----------
+
     story.append(
         Paragraph(
             "TECHNICAL SKILLS",
@@ -462,7 +531,8 @@ def create_hr_pdf(form_data, output_path):
         make_skill_chips(skills)
     )
 
-    # Projects
+    # ---------- PROJECTS ----------
+
     story.append(
         Paragraph(
             "PROJECTS",
@@ -471,7 +541,9 @@ def create_hr_pdf(form_data, output_path):
     )
 
     if projects:
-        story.extend(make_bullets(projects))
+        story.extend(
+            make_bullets(projects)
+        )
     else:
         story.append(
             Paragraph(
@@ -480,7 +552,8 @@ def create_hr_pdf(form_data, output_path):
             )
         )
 
-    # Certifications
+    # ---------- CERTIFICATIONS ----------
+
     story.append(
         Paragraph(
             "CERTIFICATIONS",
@@ -489,7 +562,9 @@ def create_hr_pdf(form_data, output_path):
     )
 
     if certifications:
-        story.extend(make_bullets(certifications))
+        story.extend(
+            make_bullets(certifications)
+        )
     else:
         story.append(
             Paragraph(
@@ -498,9 +573,12 @@ def create_hr_pdf(form_data, output_path):
             )
         )
 
-    story.append(Spacer(1, 8))
+    story.append(
+        Spacer(1, 8)
+    )
 
-    # AI Evaluation header
+    # ---------- AI EVALUATION HEADER ----------
+
     evaluation_header = Table(
         [
             [
@@ -557,10 +635,16 @@ def create_hr_pdf(form_data, output_path):
         )
     )
 
-    story.append(evaluation_header)
-    story.append(Spacer(1, 10))
+    story.append(
+        evaluation_header
+    )
 
-    # Experience summary
+    story.append(
+        Spacer(1, 10)
+    )
+
+    # ---------- EXPERIENCE SUMMARY ----------
+
     story.append(
         Paragraph(
             "<b>Experience Summary</b>",
@@ -575,9 +659,12 @@ def create_hr_pdf(form_data, output_path):
         )
     )
 
-    story.append(Spacer(1, 10))
+    story.append(
+        Spacer(1, 10)
+    )
 
-    # Strengths
+    # ---------- STRENGTHS ----------
+
     story.append(
         Paragraph(
             "<b>Strengths</b>",
@@ -597,9 +684,12 @@ def create_hr_pdf(form_data, output_path):
             )
         )
 
-    story.append(Spacer(1, 5))
+    story.append(
+        Spacer(1, 5)
+    )
 
-    # Missing information
+    # ---------- MISSING INFORMATION ----------
+
     story.append(
         Paragraph(
             "<b>Missing Information</b>",
@@ -621,9 +711,12 @@ def create_hr_pdf(form_data, output_path):
             )
         )
 
-    story.append(Spacer(1, 10))
+    story.append(
+        Spacer(1, 10)
+    )
 
-    # Overall summary
+    # ---------- OVERALL SUMMARY ----------
+
     summary_table = Table(
         [
             [
@@ -688,9 +781,15 @@ def create_hr_pdf(form_data, output_path):
         )
     )
 
-    story.append(summary_table)
+    story.append(
+        summary_table
+    )
 
-    story.append(Spacer(1, 18))
+    story.append(
+        Spacer(1, 18)
+    )
+
+    # ---------- FOOTER ----------
 
     story.append(
         Paragraph(
