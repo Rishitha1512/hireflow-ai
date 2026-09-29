@@ -1,4 +1,5 @@
 import { useState } from "react"
+const API_URL = import.meta.env.VITE_API_URL;
 
 const STAGES = [
   { id: "upload", label: "Upload resume" },
@@ -33,7 +34,7 @@ function App() {
     formData.append("file", file)
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/upload", {
+      const response = await fetch(`${API_URL}/upload`, {
         method: "POST",
         body: formData,
       })
@@ -67,7 +68,7 @@ function App() {
     setAsking(true)
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/ask", {
+      const response = await fetch(`${API_URL}/ask`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question, candidate }),
@@ -96,7 +97,7 @@ function App() {
     setEvaluating(true)
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/evaluate", {
+      const response = await fetch(`${API_URL}/evaluate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ candidate }),
@@ -125,7 +126,7 @@ function App() {
     setExporting(true)
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/generate-pdf", {
+      const response = await fetch(`${API_URL}/generate-pdf`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ candidate, evaluation }),
